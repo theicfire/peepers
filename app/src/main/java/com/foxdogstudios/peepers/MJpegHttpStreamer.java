@@ -133,6 +133,7 @@ import java.net.SocketTimeoutException;
         } // while
     } // mainLoop()
 
+    // TODO connect and stream instead of accept.. my server should be "accepting"
     private void acceptAndStream() throws IOException
     {
         ServerSocket serverSocket = null;
