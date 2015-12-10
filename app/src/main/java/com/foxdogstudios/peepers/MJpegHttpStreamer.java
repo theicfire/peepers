@@ -136,36 +136,14 @@ import java.net.SocketTimeoutException;
     // TODO connect and stream instead of accept.. my server should be "accepting"
     private void acceptAndStream() throws IOException
     {
-        ServerSocket serverSocket = null;
-        Socket socket = null;
+        Socket socket = new Socket("104.236.177.158", 2000);
         DataOutputStream stream = null;
+        stream = new DataOutputStream(socket.getOutputStream());
+        stream.writeBytes(HTTP_HEADER);
+        stream.flush();
 
         try
         {
-            serverSocket = new ServerSocket(mPort);
-            serverSocket.setSoTimeout(1000 /* milliseconds */);
-
-            do
-            {
-                try
-                {
-                    socket = serverSocket.accept();
-                } // try
-                catch (final SocketTimeoutException e)
-                {
-                    if (!mRunning)
-                    {
-                        return;
-                    } // if
-                } // catch
-            } while (socket == null);
-
-            serverSocket.close();
-            serverSocket = null;
-            stream = new DataOutputStream(socket.getOutputStream());
-            stream.writeBytes(HTTP_HEADER);
-            stream.flush();
-
             while (mRunning)
             {
                 final byte[] buffer;
@@ -240,17 +218,6 @@ import java.net.SocketTimeoutException;
                     System.err.println(closingSocket);
                 } // catch
             } // socket
-            if (serverSocket != null)
-            {
-                try
-                {
-                    serverSocket.close();
-                } // try
-                catch (final IOException closingServerSocket)
-                {
-                    System.err.println(closingServerSocket);
-                } // catch
-            } // if
         } // finally
     } // accept()
 
