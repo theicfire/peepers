@@ -1,13 +1,12 @@
 apply plugin: 'com.android.application'
-
 android {
     compileSdkVersion 19
-    buildToolsVersion "22.0.1"
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         applicationId "com.foxdogstudios.peepers"
-        minSdkVersion 19
-        targetSdkVersion 22
+        minSdkVersion 18
+        targetSdkVersion 19
     }
 
     buildTypes {
@@ -16,4 +15,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.google.android.gms:play-services:6.5.87'
 }

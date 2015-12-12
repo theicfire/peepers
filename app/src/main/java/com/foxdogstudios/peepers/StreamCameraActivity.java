@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.KeyguardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -38,6 +39,8 @@ import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
+
+import com.foxdogstudios.peepers.push.PushNotifications;
 
 import org.apache.http.conn.util.InetAddressUtils;
 
@@ -100,13 +103,18 @@ public final class StreamCameraActivity extends Activity
 
         final PowerManager powerManager =
                 (PowerManager) getSystemService(POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK,
+        mWakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP,
                 WAKE_LOCK_TAG);
+
+        KeyguardManager km = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+        km.newKeyguardLock("name").disableKeyguard();
+        (new PushNotifications(getApplicationContext(), this)).runRegisterInBackground();
     } // onCreate(Bundle)
 
     @Override
     protected void onResume()
     {
+        Log.d(TAG, "resume");
         super.onResume();
         mRunning = true;
         if (mPrefs != null)
@@ -122,6 +130,7 @@ public final class StreamCameraActivity extends Activity
     @Override
     protected void onPause()
     {
+        Log.d(TAG, "pause");
         mWakeLock.release();
         super.onPause();
         mRunning = false;
@@ -334,6 +343,27 @@ public final class StreamCameraActivity extends Activity
         } // catch
         return null;
     } // tryGetIpV4Address()
+
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+//        setIntent(intent);//must store the new intent unless getIntent() will return the old one
+        Log.d(TAG, "got intent");
+        String intentText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        Log.d(TAG, "got intent text" + intentText);
+        if (intentText.equalsIgnoreCase("camera_on")) {
+            mWakeLock.acquire();
+        } else if (intentText.equalsIgnoreCase("camera_off")) {
+            Log.d(TAG, "TURN OFF");
+
+            Intent inte = new Intent(Intent.ACTION_MAIN);
+            inte.addCategory(Intent.CATEGORY_HOME);
+            inte.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(inte);
+            android.os.Process.killProcess(android.os.Process.myPid());
+
+
+        }
+    }
 
 } // class StreamCameraActivity
 

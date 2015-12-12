@@ -25,6 +25,13 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+
+    <permission android:name="com.foxdogstudios.peepers.push.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.foxdogstudios.peepers.push.permission.C2D_MESSAGE" />
+    <uses-permission
+        android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <application
         android:label="@string/app_name"
@@ -42,6 +49,16 @@
             </intent-filter>
         </activity>
         <activity android:name="PeepersPreferenceActivity" />
+        <receiver
+            android:name="com.foxdogstudios.peepers.push.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <!-- Receives the actual messages. -->
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.foxdogstudios.peepers.push" />
+            </intent-filter>
+        </receiver>
+        <service android:name="com.foxdogstudios.peepers.push.GcmIntentService" />
     </application>
 </manifest>
 
